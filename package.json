@@ -1,0 +1,17 @@
+{
+  "name": "withdraw-astar",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "npx tsc && node dist/index.js -c"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@polkadot/api": "^10.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "typescript": "^5.2.2"
+  }
+}
