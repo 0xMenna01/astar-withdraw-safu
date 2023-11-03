@@ -6,13 +6,13 @@ const WITHDRAW_ERA = 561
 const TX_TIP = 3 * 10 ** 18 // 18 decimals
 
 async function main() {
-    // Keyring material
-    const keyring = new Keyring({ type: 'sr25519' })
-    const keyPair = keyring.addFromUri(config.seedPhrase)
-
     // Construct
     const wsProvider = new WsProvider('wss://astar.api.onfinality.io/public-ws')
     const api = await ApiPromise.create({ provider: wsProvider })
+
+    // Keyring material
+    const keyring = new Keyring({ type: 'sr25519' })
+    const keyPair = keyring.addFromUri(config.seedPhrase)
 
     // Retrieve the chain name
     const chain = await api.rpc.system.chain()
@@ -64,7 +64,7 @@ async function main() {
                     }
                 )
             }
-            
+
             if (!isSentTransfer && isWithdrawSuccess) {
                 isSentTransfer = true
 
