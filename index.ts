@@ -16,9 +16,6 @@ async function main() {
 
     // Retrieve the chain name
     const chain = await api.rpc.system.chain()
-
-    let isReady = false
-
     // Subscribe to the new headers
     const unsub = await api.rpc.chain.subscribeNewHeads(async () => {
         const strEra = (await api.query.dappsStaking.currentEra()).toString()
@@ -26,7 +23,6 @@ async function main() {
         console.log(`${chain} current era: ${era}\n`)
 
         if (era >= 554) {
-            isReady = true
             unsub()
 
             // Withdraw Era - Prepare for withdrawing funds
