@@ -3,10 +3,10 @@ import { ApiPromise, Keyring, WsProvider } from '@polkadot/api'
 import { config } from './config'
 
 const WITHDRAW_ERA = 561
-const TX_TIP = 3 * 10 ** 18 // 18 decimals
+const TX_TIP = 3 * 10 ** 18 // 3 ASTAR
 
 async function main() {
-    // Construct
+    // Construct Api
     const wsProvider = new WsProvider('wss://astar.api.onfinality.io/public-ws')
     const api = await ApiPromise.create({ provider: wsProvider })
 
@@ -16,13 +16,17 @@ async function main() {
 
     // Retrieve the chain name
     const chain = await api.rpc.system.chain()
+
+    // Convert tip
+    const txTip = TX_TIP.toString()
+
     // Subscribe to the new headers
     const unsub = await api.rpc.chain.subscribeNewHeads(async () => {
         const strEra = (await api.query.dappsStaking.currentEra()).toString()
         const era = parseInt(strEra, 10)
         console.log(`${chain} current era: ${era}\n`)
 
-        if (era >= 554) {
+        if (era >= WITHDRAW_ERA) {
             unsub()
 
             // Withdraw Era - Prepare for withdrawing funds
@@ -31,9 +35,9 @@ async function main() {
 
             await withdrawTx.signAndSend(
                 keyPair,
-                { tip: TX_TIP },
+                { tip: txTip },
                 async (result) => {
-                    console.log(`Current status is ${result.status}`)
+                    console.log(`Current status is ${result.status}\n`)
 
                     if (result.status.isInBlock) {
                         console.log(
@@ -43,14 +47,14 @@ async function main() {
 
                         // Make transfer
                         console.log(
-                            `Redy to tranfer funds to address: ${config.recievingAddress}..\n`
+                            `Redy to tranfer funds to address: ${config.recievingAddress}..`
                         )
 
                         const transferTxHash = await api.tx.balances
                             .transferAll(config.recievingAddress, false)
-                            .signAndSend(keyPair, { tip: TX_TIP })
+                            .signAndSend(keyPair, { tip: txTip })
                         // Show the hash
-                        console.log(`Submitted with hash ${transferTxHash}`)
+                        console.log(`Submitted with hash ${transferTxHash}\n`)
                         // Exit
                         console.log(`Job DONE :) \nExiting..`)
                         process.exit(0)
