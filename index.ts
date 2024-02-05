@@ -6,6 +6,7 @@ const WITHDRAW_ERA = 561
 const TX_TIP = 3 * 10 ** 18 // 3 ASTAR
 
 async function main() {
+    let is_tx_sent = false
     // Construct Api
     const wsProvider = new WsProvider('wss://astar.api.onfinality.io/public-ws')
     const api = await ApiPromise.create({ provider: wsProvider })
@@ -25,8 +26,9 @@ async function main() {
         const strEra = (await api.query.dappsStaking.currentEra()).toString()
         const era = parseInt(strEra, 10)
         console.log(`${chain} current era: ${era}\n`)
-
-        if (era >= WITHDRAW_ERA) {
+        
+        if (era >= WITHDRAW_ERA && !is_tx_sent) {
+            is_tx_sent = true
             unsub()
 
             // Withdraw Era - Prepare for withdrawing funds
